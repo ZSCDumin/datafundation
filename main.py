@@ -81,7 +81,7 @@ prediction = test[['session_id']]
 prediction[y_col] = 0
 df_importance_list = []
 
-kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=2048)
+kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 for fold_id, (trn_idx, val_idx) in enumerate(kfold.split(train[feature_names], train[y_col])):
     X_train = train.iloc[trn_idx][feature_names]
     Y_train = train.iloc[trn_idx][y_col]
@@ -89,35 +89,20 @@ for fold_id, (trn_idx, val_idx) in enumerate(kfold.split(train[feature_names], t
     Y_val = train.iloc[val_idx][y_col]
     print('\nFold_{} Training ================================\n'.format(fold_id + 1))
 
-    lgb_model = model.fit(X_train,
-                          Y_train,
-                          eval_names=['train', 'valid'],
-                          eval_set=[(X_train, Y_train), (X_val, Y_val)],
-                          verbose=500,
-                          eval_metric='auc',
-                          early_stopping_rounds=50)
+    model.fit(X_train,
+              Y_train,
+              eval_names=['train', 'valid'],
+              eval_set=[(X_train, Y_train), (X_val, Y_val)],
+              verbose=500,
+              eval_metric='auc',
+              early_stopping_rounds=50)
 
-    pred_val = lgb_model.predict_proba(X_val, num_iteration=lgb_model.best_iteration_)
+    pred_val = model.predict_proba(X_val)
     df_oof = train.iloc[val_idx][['session_id', y_col]].copy()
     df_oof['pred'] = pred_val[:, 1]
     oof.append(df_oof)
-
-    pred_test = lgb_model.predict_proba(
-        test[feature_names], num_iteration=lgb_model.best_iteration_)
+    pred_test = model.predict_proba(test[feature_names])
     prediction[y_col] += pred_test[:, 1] / kfold.n_splits
-
-    df_importance = pd.DataFrame({
-        'column': feature_names,
-        'importance': lgb_model.feature_importances_,
-    })
-    df_importance_list.append(df_importance)
-
-    del lgb_model, pred_val, pred_test, X_train, Y_train, X_val, Y_val
-    gc.collect()
-
-df_importance = pd.concat(df_importance_list)
-df_importance = df_importance.groupby(['column'])['importance'].agg('mean').sort_values(ascending=False).reset_index()
-print(df_importance)
 
 df_oof = pd.concat(oof)
 print('roc_auc_score', roc_auc_score(df_oof[y_col], df_oof['pred']))
