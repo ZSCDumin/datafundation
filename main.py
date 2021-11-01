@@ -61,17 +61,15 @@ for method in ['mean', 'max', 'min', 'std']:
 
 train = data[data['risk_label'].notna()]
 test = data[data['risk_label'].isna()]
-train.fillna(-999, inplace=True)
-test.fillna(-999, inplace=True)
 
 y_col = 'risk_label'
 feature_names = list(filter(lambda x: x not in [y_col, 'session_id', 'op_date', 'last_ts'], train.columns))
 
 isolation_forest = get_base_model("isolation forest")
-isolation_forest.fit(train[feature_names], train[y_col])
+isolation_forest.fit(train[feature_names].fillna(-999), train[y_col])
 
-train['iso_pred'] = isolation_forest.predict(train[feature_names])
-test['iso_pred'] = isolation_forest.predict(test[feature_names])
+train['iso_pred'] = isolation_forest.predict(train[feature_names].fillna(-999))
+test['iso_pred'] = isolation_forest.predict(test[feature_names].fillna(-999))
 
 feature_names.append('iso_pred')
 
@@ -88,7 +86,6 @@ for fold_id, (trn_idx, val_idx) in enumerate(kfold.split(train[feature_names], t
     X_val = train.iloc[val_idx][feature_names]
     Y_val = train.iloc[val_idx][y_col]
     print('\nFold_{} Training ================================\n'.format(fold_id + 1))
-
     model.fit(X_train,
               Y_train,
               eval_names=['train', 'valid'],
