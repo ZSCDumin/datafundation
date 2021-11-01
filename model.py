@@ -5,6 +5,7 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, AdaBo
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
+from skopt import BayesSearchCV
 
 
 def get_base_model(model_type=None):
@@ -54,3 +55,33 @@ def get_base_model(model_type=None):
         return KNeighborsClassifier(n_neighbors=5, n_jobs=32)
     elif model_type == "isolation forest":
         return IsolationForest(n_estimators=10000, random_state=42, n_jobs=32, verbose=100)
+
+
+def search_parameters(x_train=None, y_train=None, x_val=None, y_val=None, estimator=None, search_spaces=None, scoring='roc_auc',
+                      cv=None, n_jobs=32, n_iter=30, n_points=1):
+    """
+    贝叶斯参数搜索
+    :return:
+    """
+    bayes_cv_tuner = BayesSearchCV(estimator=estimator,
+                                   search_spaces=search_spaces,
+                                   scoring=scoring,
+                                   fit_params={
+                                       'eval_set': [(x_val, y_val)],
+                                       'eval_metric': 'auc',
+                                       'early_stopping_rounds': 30
+                                   },
+                                   cv=cv,
+                                   optimizer_kwargs={'base_estimator': 'GP'},
+                                   n_jobs=n_jobs,
+                                   n_iter=n_iter,
+                                   n_points=n_points,
+                                   pre_dispatch='2*n_jobs',
+                                   verbose=0,
+                                   refit=True,
+                                   random_state=42,
+                                   return_train_score=True)
+    bayes_cv_tuner.fit(X=x_train, y=y_train)
+    dict_ = {"best_score": bayes_cv_tuner.best_score_, "best_params": bayes_cv_tuner.best_params_}
+    print(dict_)
+    return bayes_cv_tuner.best_params_

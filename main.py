@@ -14,7 +14,8 @@ from tqdm import tqdm
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score
-from model import get_base_model
+from model import get_base_model, search_parameters
+from skopt.space.space import Integer, Real
 
 train = pd.read_csv('train/train_dataset.csv', sep='\t')
 test = pd.read_csv('test/test_dataset.csv', sep='\t')
@@ -74,6 +75,24 @@ test['iso_pred'] = isolation_forest.predict(test[feature_names].fillna(-999))
 feature_names.append('iso_pred')
 
 model = get_base_model('lightgbm')
+best_parameters = search_parameters(estimator=model,
+                                    x_train=train[feature_names],
+                                    y_train=train[y_col],
+                                    scoring='roc_auc',
+                                    cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
+                                    n_jobs=32,
+                                    n_points=5,
+                                    n_iter=50,
+                                    search_spaces={
+                                        'learning_rate': Real(0.001, 0.1, 'log-uniform'),
+                                        'min_child_weight': Integer(1, 10),
+                                        'max_depth': Integer(8, 16),
+                                        'num_leaves': Integer(64, 512),
+                                        'subsample': Real(0.1, 0.9),
+                                        'colsample_bytree': Real(0.1, 0.9)
+                                    })
+model.set_params(**best_parameters)
+
 oof = []
 prediction = test[['session_id']]
 prediction[y_col] = 0
