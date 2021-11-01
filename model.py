@@ -21,7 +21,7 @@ def get_base_model(model_type=None):
                                  reg_lambda=0.,
                                  scale_pos_weight=5,
                                  random_state=2048,
-
+                                 n_jobs=32,
                                  metric='auc')
     elif model_type == 'lightgbm':
         return lgb.LGBMClassifier(objective='binary',
@@ -35,14 +35,15 @@ def get_base_model(model_type=None):
                                   reg_alpha=0.,
                                   reg_lambda=0.,
                                   random_state=2048,
+                                  n_jobs=32,
                                   is_unbalance=True,
                                   metric='auc')
     elif model_type == 'random forest':
-        return RandomForestClassifier(n_estimators=1000, n_jobs=8, random_state=42)
+        return RandomForestClassifier(n_estimators=1000, n_jobs=32, random_state=42)
     elif model_type == "catboost":
-        return CatBoostClassifier(n_estimators=1000, random_state=42, thread_count=8, custom_metric="AUC", early_stopping_rounds=50)
+        return CatBoostClassifier(n_estimators=1000, random_state=42, thread_count=32, custom_metric="AUC", early_stopping_rounds=50)
     elif model_type == "extra trees":
-        return ExtraTreesClassifier(n_estimators=1000, n_jobs=8, random_state=42)
+        return ExtraTreesClassifier(n_estimators=1000, n_jobs=32, random_state=42)
     elif model_type == "lr":
         return LogisticRegression(random_state=42)
     elif model_type == "svc":
@@ -50,4 +51,4 @@ def get_base_model(model_type=None):
     elif model_type == "adaboost":
         return AdaBoostClassifier(n_estimators=1000, random_state=42)
     elif model_type == "knn":
-        return KNeighborsClassifier(n_neighbors=10, n_jobs=8)
+        return KNeighborsClassifier(n_neighbors=5, n_jobs=32)

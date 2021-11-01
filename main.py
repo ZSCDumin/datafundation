@@ -79,7 +79,7 @@ estimators = [
     ('knn', get_base_model('knn'))
 ]
 
-model = StackingClassifier(estimators=estimators, final_estimator=get_base_model('lr'), n_jobs=16, cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42))
+model = StackingClassifier(estimators=estimators, final_estimator=get_base_model('lr'), n_jobs=32, cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42))
 model.fit(train[feature_names], train[y_col])
 
 test_pred = model.predict_proba(test[feature_names])[:, 1]
