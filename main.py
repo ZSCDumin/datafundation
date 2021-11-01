@@ -8,7 +8,6 @@ warnings.simplefilter('ignore')
 import json
 import numpy as np
 import pandas as pd
-import gc
 from tqdm import tqdm
 
 from sklearn.preprocessing import LabelEncoder
