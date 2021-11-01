@@ -85,7 +85,7 @@ model = StackingClassifier(estimators=estimators, final_estimator=get_base_model
 model.fit(train[feature_names], train[y_col])
 
 test_pred = model.predict_proba(test[feature_names])[:, 1]
-print('roc_auc_score', roc_auc_score(test_pred, test[y_col]))
+print('roc_auc_score', roc_auc_score(test[y_col], test_pred))
 submit = pd.read_csv("submit.csv")
 sns.distplot(submit['ret'])
 plt.savefig('results.png')
