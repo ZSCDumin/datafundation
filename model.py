@@ -1,7 +1,7 @@
 import lightgbm as lgb
 import xgboost as xgb
 from catboost import CatBoostClassifier
-from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, AdaBoostClassifier, IsolationForest
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -52,3 +52,5 @@ def get_base_model(model_type=None):
         return AdaBoostClassifier(n_estimators=1000, random_state=42)
     elif model_type == "knn":
         return KNeighborsClassifier(n_neighbors=5, n_jobs=32)
+    elif model_type == "isolation forest":
+        return IsolationForest(n_estimators=1000, random_state=42, n_jobs=32)

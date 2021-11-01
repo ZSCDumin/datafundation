@@ -69,16 +69,16 @@ test.fillna(-999, inplace=True)
 y_col = 'risk_label'
 feature_names = list(filter(lambda x: x not in [y_col, 'session_id', 'op_date', 'last_ts'], train.columns))
 
+isolation_forest = get_base_model("isolation forest")
+isolation_forest.fit(train[feature_names], train[y_col])
+
+train['iso_pred'] = isolation_forest.predict(train[feature_names])
+test['iso_pred'] = isolation_forest.predict(test[feature_names])
+
+feature_names.append('iso_pred')
 estimators = [
     ('lightgbm', get_base_model('lightgbm')),
-    ('xgboost', get_base_model('xgboost')),
-    ('catboost', get_base_model('catboost')),
-    ('adaboost', get_base_model('adaboost')),
-    ('random forest', get_base_model('random forest')),
-    ('extra trees', get_base_model('extra trees')),
-    ('svc', get_base_model('svc')),
-    ('lr', get_base_model('lr')),
-    ('knn', get_base_model('knn'))
+    ('xgboost', get_base_model('xgboost'))
 ]
 
 model = StackingClassifier(estimators=estimators, final_estimator=get_base_model('lr'), n_jobs=32, cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42))
