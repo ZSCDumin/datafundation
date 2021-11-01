@@ -63,6 +63,8 @@ for method in ['mean', 'max', 'min', 'std']:
 
 train = data[data['risk_label'].notna()]
 test = data[data['risk_label'].isna()]
+train = train.fillna(-999, inplace=True)
+test = test.fillna(-999, inplace=True)
 
 y_col = 'risk_label'
 feature_names = list(filter(lambda x: x not in [y_col, 'session_id', 'op_date', 'last_ts'], train.columns))
