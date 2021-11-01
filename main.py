@@ -116,8 +116,7 @@ for fold_id, (trn_idx, val_idx) in enumerate(kfold.split(train[feature_names], t
     gc.collect()
 
 df_importance = pd.concat(df_importance_list)
-df_importance = df_importance.groupby(['column'])['importance'].agg(
-    'mean').sort_values(ascending=False).reset_index()
+df_importance = df_importance.groupby(['column'])['importance'].agg('mean').sort_values(ascending=False).reset_index()
 print(df_importance)
 
 df_oof = pd.concat(oof)
