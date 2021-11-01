@@ -110,5 +110,5 @@ prediction['id'] = range(len(prediction))
 prediction['id'] = prediction['id'] + 1
 prediction = prediction[['id', 'risk_label']].copy()
 prediction.columns = ['id', 'ret']
-print(prediction.head())
+prediction['ret'] = prediction['ret'].apply(lambda x: 1 if x >= 0.5 else 0)
 prediction.to_csv("submit.csv", index=False)
