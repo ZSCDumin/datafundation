@@ -86,7 +86,7 @@ best_parameters = search_parameters(estimator=model,
                                     search_spaces={
                                         'learning_rate': Real(0.001, 0.1, 'log-uniform'),
                                         'min_child_weight': Integer(1, 10),
-                                        'max_depth': Integer(8, 16),
+                                        'max_depth': Integer(5, 16),
                                         'num_leaves': Integer(64, 512),
                                         'subsample': Real(0.1, 0.9),
                                         'colsample_bytree': Real(0.1, 0.9)
