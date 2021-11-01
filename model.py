@@ -54,7 +54,7 @@ def get_base_model(model_type=None):
     elif model_type == "knn":
         return KNeighborsClassifier(n_neighbors=5, n_jobs=32)
     elif model_type == "isolation forest":
-        return IsolationForest(n_estimators=10000, random_state=42, n_jobs=32, verbose=100)
+        return IsolationForest(n_estimators=1000, random_state=42, n_jobs=32, verbose=100)
 
 
 def search_parameters(x_train=None, y_train=None, x_val=None, y_val=None, estimator=None, search_spaces=None, scoring='roc_auc',
