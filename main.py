@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from sklearn.preprocessing import LabelEncoder
+from category_encoders import TargetEncoder
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score
 from model import get_base_model, search_parameters
@@ -44,14 +44,32 @@ for col in tqdm(['user_name', 'action', 'auth_type', 'ip',
                  'os_type', 'os_version', 'browser_type', 'browser_version',
                  'bus_system_code', 'op_target', 'location_first_lvl', 'location_sec_lvl',
                  'location_third_lvl']):
-    lbl = LabelEncoder()
-    data[col] = lbl.fit_transform(data[col])
+    lbl = TargetEncoder()
+    data[col] = lbl.fit_transform(data[col], data['risk_label'])
 
 data['op_date'] = pd.to_datetime(data['op_date'])
 data['op_ts'] = data["op_date"].values.astype(np.int64) // 10 ** 9
 data = data.sort_values(by=['user_name', 'op_ts']).reset_index(drop=True)
 data['last_ts'] = data.groupby(['user_name'])['op_ts'].shift(1)
 data['ts_diff1'] = data['op_ts'] - data['last_ts']
+
+data['year'] = data['op_date'].dt.year
+data['month'] = data['op_date'].dt.month
+data['day'] = data['op_date'].dt.day
+data['hour'] = data['op_date'].dt.hour
+data['minute'] = data['op_date'].dt.minute
+data['week_day'] = data['op_date'].dt.weekday + 1
+data['is_weekend'] = data['week_day'].apply(lambda x: 1 if x > 5 else 0)
+
+op_hour_merge = data.groupby(by=['user_name', 'year', 'month', 'day', 'hour']).agg(risk_label_hour_mean=("risk_label", "mean"), risk_label_hour_sum=("risk_label", "sum"), session_id_hour_cnt=("session_id", "count"))
+op_day_merge = data.groupby(by=['user_name', 'year', 'month', 'day']).agg(risk_label_day_mean=("risk_label", "mean"), risk_label_day_sum=("risk_label", "sum"), session_id_day_cnt=("session_id", "count"))
+op_month_merge = data.groupby(by=['user_name', 'year', 'month']).agg(risk_label_month_mean=("risk_label", "mean"), risk_label_month_sum=("risk_label", "sum"), session_id_month_cnt=("session_id", "count"))
+op_year_merge = data.groupby(by=['user_name', 'year']).agg(risk_label_year_mean=("risk_label", "mean"), risk_label_year_sum=("risk_label", "sum"), session_id_year_cnt=("session_id", "count"))
+
+data = data.merge(op_hour_merge, on=['user_name', 'year', 'month', 'day', 'hour'])
+data = data.merge(op_day_merge, on=['user_name', 'year', 'month', 'day'])
+data = data.merge(op_month_merge, on=['user_name', 'year', 'month'])
+data = data.merge(op_year_merge, on=['user_name', 'year'])
 
 for f in ['ip', 'location', 'device_model', 'os_version', 'browser_version']:
     data[f'user_{f}_nunique'] = data.groupby(['user_name'])[f].transform('nunique')
