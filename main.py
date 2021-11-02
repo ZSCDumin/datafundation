@@ -61,10 +61,10 @@ data['minute'] = data['op_date'].dt.minute
 data['week_day'] = data['op_date'].dt.weekday + 1
 data['is_weekend'] = data['week_day'].apply(lambda x: 1 if x > 5 else 0)
 
-op_hour_merge = data.groupby(by=['user_name', 'year', 'month', 'day', 'hour']).agg(risk_label_hour_mean=("risk_label", "mean"), risk_label_hour_sum=("risk_label", "sum"), session_id_hour_cnt=("session_id", "count"))
-op_day_merge = data.groupby(by=['user_name', 'year', 'month', 'day']).agg(risk_label_day_mean=("risk_label", "mean"), risk_label_day_sum=("risk_label", "sum"), session_id_day_cnt=("session_id", "count"))
-op_month_merge = data.groupby(by=['user_name', 'year', 'month']).agg(risk_label_month_mean=("risk_label", "mean"), risk_label_month_sum=("risk_label", "sum"), session_id_month_cnt=("session_id", "count"))
-op_year_merge = data.groupby(by=['user_name', 'year']).agg(risk_label_year_mean=("risk_label", "mean"), risk_label_year_sum=("risk_label", "sum"), session_id_year_cnt=("session_id", "count"))
+op_hour_merge = data.groupby(by=['user_name', 'year', 'month', 'day', 'hour']).agg(session_id_hour_cnt=("session_id", "count"))
+op_day_merge = data.groupby(by=['user_name', 'year', 'month', 'day']).agg(session_id_day_cnt=("session_id", "count"))
+op_month_merge = data.groupby(by=['user_name', 'year', 'month']).agg(session_id_month_cnt=("session_id", "count"))
+op_year_merge = data.groupby(by=['user_name', 'year']).agg(session_id_year_cnt=("session_id", "count"))
 
 data = data.merge(op_hour_merge, on=['user_name', 'year', 'month', 'day', 'hour'])
 data = data.merge(op_day_merge, on=['user_name', 'year', 'month', 'day'])
@@ -115,7 +115,7 @@ prediction = test[['session_id']]
 prediction[y_col] = 0
 df_importance_list = []
 
-kfold = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 for fold_id, (trn_idx, val_idx) in enumerate(kfold.split(train[feature_names], train[y_col])):
     X_train = train.iloc[trn_idx][feature_names]
     Y_train = train.iloc[trn_idx][y_col]
@@ -142,5 +142,6 @@ prediction['id'] = range(len(prediction))
 prediction['id'] = prediction['id'] + 1
 prediction = prediction[['id', 'risk_label']].copy()
 prediction.columns = ['id', 'ret']
+print(prediction['ret'].max())
 prediction['ret'] = prediction['ret'].apply(lambda x: 1 if x >= 0.5 else 0)
 prediction.to_csv("submit.csv", index=False)
