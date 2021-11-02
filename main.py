@@ -98,13 +98,13 @@ best_parameters = search_parameters(estimator=model,
                                     scoring='roc_auc',
                                     cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=42),
                                     n_jobs=32,
-                                    n_points=1,
+                                    n_points=10,
                                     n_iter=50,
                                     search_spaces={
                                         'learning_rate': Real(0.01, 0.1, 'log-uniform'),
                                         'min_child_weight': Integer(1, 10),
                                         'max_depth': Integer(5, 16),
-                                        'num_leaves': Integer(64, 512),
+                                        'num_leaves': Integer(32, 256),
                                         'subsample': Real(0.1, 0.9),
                                         'colsample_bytree': Real(0.1, 0.9)
                                     })
