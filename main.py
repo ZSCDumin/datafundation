@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from category_encoders import TargetEncoder
 from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import roc_auc_score
 from model import get_base_model, search_parameters
 from skopt.space.space import Integer, Real
@@ -44,8 +45,8 @@ for col in tqdm(['user_name', 'action', 'auth_type', 'ip',
                  'os_type', 'os_version', 'browser_type', 'browser_version',
                  'bus_system_code', 'op_target', 'location_first_lvl', 'location_sec_lvl',
                  'location_third_lvl']):
-    lbl = TargetEncoder()
-    data[col] = lbl.fit_transform(data[col], data['risk_label'])
+    lbl = LabelEncoder()
+    data[col] = lbl.fit_transform(data[col])
 
 data['op_date'] = pd.to_datetime(data['op_date'])
 data['op_ts'] = data["op_date"].values.astype(np.int64) // 10 ** 9
