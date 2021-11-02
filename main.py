@@ -96,7 +96,7 @@ best_parameters = search_parameters(estimator=model,
                                     x_train=train[feature_names],
                                     y_train=train[y_col],
                                     scoring='roc_auc',
-                                    cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=42),
+                                    cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
                                     n_jobs=32,
                                     n_points=10,
                                     n_iter=50,
@@ -122,8 +122,7 @@ for fold_id, (trn_idx, val_idx) in enumerate(kfold.split(train[feature_names], t
     X_val = train.iloc[val_idx][feature_names]
     Y_val = train.iloc[val_idx][y_col]
     print('\nFold_{} Training ================================\n'.format(fold_id + 1))
-    model.fit(X_train,
-              Y_train,
+    model.fit(X_train, Y_train,
               eval_names=['train', 'valid'],
               eval_set=[(X_train, Y_train), (X_val, Y_val)],
               verbose=500,

@@ -70,7 +70,7 @@ def search_parameters(x_train=None, y_train=None, x_val=None, y_val=None, estima
                                    fit_params={
                                        'eval_set': [(x_val, y_val)],
                                        'eval_metric': 'auc',
-                                       'early_stopping_rounds': 30
+                                       'early_stopping_rounds': 50
                                    },
                                    cv=cv,
                                    optimizer_kwargs={'base_estimator': 'GP'},
