@@ -63,6 +63,7 @@ def search_parameters(x_train=None, y_train=None, x_val=None, y_val=None, estima
     贝叶斯参数搜索
     :return:
     """
+    print("开始贝叶斯调参！")
     bayes_cv_tuner = BayesSearchCV(estimator=estimator,
                                    search_spaces=search_spaces,
                                    scoring=scoring,
@@ -77,7 +78,7 @@ def search_parameters(x_train=None, y_train=None, x_val=None, y_val=None, estima
                                    n_iter=n_iter,
                                    n_points=n_points,
                                    pre_dispatch='2*n_jobs',
-                                   verbose=0,
+                                   verbose=100,
                                    refit=True,
                                    random_state=42,
                                    return_train_score=True)
