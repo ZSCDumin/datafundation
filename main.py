@@ -65,13 +65,13 @@ test = data[data['risk_label'].isna()]
 y_col = 'risk_label'
 feature_names = list(filter(lambda x: x not in [y_col, 'session_id', 'op_date', 'last_ts'], train.columns))
 
-isolation_forest = get_base_model("isolation forest")
-isolation_forest.fit(train[feature_names].fillna(-999), train[y_col])
-
-train['iso_pred'] = isolation_forest.predict(train[feature_names].fillna(-999))
-test['iso_pred'] = isolation_forest.predict(test[feature_names].fillna(-999))
-
-feature_names.append('iso_pred')
+# isolation_forest = get_base_model("isolation forest")
+# isolation_forest.fit(train[feature_names].fillna(-999), train[y_col])
+#
+# train['iso_pred'] = isolation_forest.predict(train[feature_names].fillna(-999))
+# test['iso_pred'] = isolation_forest.predict(test[feature_names].fillna(-999))
+#
+# feature_names.append('iso_pred')
 
 model = get_base_model('lightgbm')
 # best_parameters = search_parameters(estimator=model,
