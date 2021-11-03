@@ -10,7 +10,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from category_encoders import TargetEncoder
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import roc_auc_score
