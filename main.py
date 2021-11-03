@@ -65,32 +65,32 @@ test = data[data['risk_label'].isna()]
 y_col = 'risk_label'
 feature_names = list(filter(lambda x: x not in [y_col, 'session_id', 'op_date', 'last_ts'], train.columns))
 
-# isolation_forest = get_base_model("isolation forest")
-# isolation_forest.fit(train[feature_names].fillna(-999), train[y_col])
-#
-# train['iso_pred'] = isolation_forest.predict(train[feature_names].fillna(-999))
-# test['iso_pred'] = isolation_forest.predict(test[feature_names].fillna(-999))
-#
-# feature_names.append('iso_pred')
+isolation_forest = get_base_model("isolation forest")
+isolation_forest.fit(train[feature_names].fillna(-999), train[y_col])
+
+train['iso_pred'] = isolation_forest.predict(train[feature_names].fillna(-999))
+test['iso_pred'] = isolation_forest.predict(test[feature_names].fillna(-999))
+
+feature_names.append('iso_pred')
 
 model = get_base_model('lightgbm')
-# best_parameters = search_parameters(estimator=model,
-#                                     x_train=train[feature_names],
-#                                     y_train=train[y_col],
-#                                     scoring='roc_auc',
-#                                     cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=42),
-#                                     n_jobs=32,
-#                                     n_points=1,
-#                                     n_iter=50,
-#                                     search_spaces={
-#                                         'learning_rate': Real(0.01, 0.1, 'log-uniform'),
-#                                         'min_child_weight': Integer(1, 10),
-#                                         'max_depth': Integer(5, 16),
-#                                         'num_leaves': Integer(32, 256),
-#                                         'subsample': Real(0.1, 0.9),
-#                                         'colsample_bytree': Real(0.1, 0.9)
-#                                     })
-# model.set_params(**best_parameters)
+best_parameters = search_parameters(estimator=model,
+                                    x_train=train[feature_names],
+                                    y_train=train[y_col],
+                                    scoring='roc_auc',
+                                    cv=StratifiedKFold(n_splits=3, shuffle=True, random_state=42),
+                                    n_jobs=32,
+                                    n_points=1,
+                                    n_iter=50,
+                                    search_spaces={
+                                        'learning_rate': Real(0.01, 0.1, 'log-uniform'),
+                                        'min_child_weight': Integer(1, 10),
+                                        'max_depth': Integer(5, 16),
+                                        'num_leaves': Integer(32, 256),
+                                        'subsample': Real(0.1, 0.9),
+                                        'colsample_bytree': Real(0.1, 0.9)
+                                    })
+model.set_params(**best_parameters)
 
 oof = []
 prediction = test[['session_id']]
